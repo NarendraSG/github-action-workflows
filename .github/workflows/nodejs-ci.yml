@@ -258,7 +258,7 @@ jobs:
         id: pulse_report
         if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
         working-directory: ${{ github.workspace }}
-        run: cat test-coverage-report.md
+        run: tree
       - name: Technology based scans after step
         if: ${{ inputs.technology_based_scans_after_step_command != '' }}
         run: |
