@@ -271,6 +271,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           json_payload=$(jq -n  --arg userId "123" --arg message "This is a test" --argjson coverage $(jq -c . coverage/coverage-summary.json) '{ userId: $userId, message: $message, coverage: $coverage}')
+          echo $json_payload
           hmac=$(echo -n "$json_payload" | tr -d '\n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $2}')
           curl -v -X POST https://wicked-corners-bet.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $hmac" -d "$json_payload"
           
