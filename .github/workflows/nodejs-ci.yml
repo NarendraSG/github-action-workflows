@@ -271,7 +271,8 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           json_payload=$(jq -n  --arg userId "123" --arg message "This is a test" --argjson coverage $(jq -c . coverage/coverage-summary.json) '{ userId: $userId, message: $message, coverage: $coverage}')
-          echo "::set-output name=tc_teport::$json_payload"
+          # echo "::set-output name=tc_teport::$json_payload"
+          echo "tc_teport=$json_payload" >> $GITHUB_ENV
       
       - name: Generating HMAC
         id: generate_hamc_pulse_report
@@ -280,7 +281,8 @@ jobs:
         run: |
           # echo -n "$json_payload" | tr -d '\n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $1}'
           hmac=$(echo -n "$json_payload" | tr -d '\n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $2}')
-          echo "::set-output name=tc_signature::$hmac"
+          # echo "::set-output name=tc_signature::$hmac"
+          echo "tc_signature=$hmac" >> $GITHUB_ENV
 
       - name: Sending to Pulse HMAC
         id: post_hamc_pulse_report
@@ -288,7 +290,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           # curl -X POST https://yellow-ads-begin.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $hmac" -d "$json_payload"
-          curl -X POST https://yellow-ads-begin.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: ${{ steps.generate_hamc_pulse_report.outputs.tc_signature }}" -d "${{ steps.compose_pulse_report.outputs.tc_teport }}"
+          curl -X POST https://yellow-ads-begin.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $tc_signature" -d "$tc_teport"
 
       - name: Technology based scans after step
         if: ${{ inputs.technology_based_scans_after_step_command != '' }}
