@@ -270,7 +270,7 @@ jobs:
         if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
         working-directory: ${{ github.workspace }}
         run: |
-          json_payload=$(jq -n  --arg userId "123" --arg message "This is a test" --argjson coverage $(jq -c . coverage-summary.json) '{ userId: $userId, message: $message, coverage: $coverage}')
+          json_payload=$(jq -n  --arg userId "123" --arg message "This is a test" --argjson coverage $(jq -c . coverage/coverage-summary.json) '{ userId: $userId, message: $message, coverage: $coverage}')
       
       - name: Generating HMAC
         id: generate_hamc_pulse_report
