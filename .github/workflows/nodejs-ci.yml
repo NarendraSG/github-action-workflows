@@ -9,7 +9,7 @@ on:
     inputs:
       my_command:
         type: string
-        default: "dir"
+        default: "cat coverage-summary.json" #"dir"
       excluded_jobs:
         type: string
         default: ""
