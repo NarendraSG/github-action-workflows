@@ -281,7 +281,8 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           json_payload=$(echo "$tc_report" | base64 --decode)
-          hmac=$(echo -n "$json_payload" | tr -d '\n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $2}')
+          # hmac=$(echo -n "$json_payload" | tr -d '\n' | openssl dgst -sha256 -hmac "supersecretkey")
+          hmac=$(echo -n "$json_payload" | openssl dgst -sha256 -hmac "supersecretkey")
           echo "tc_signature=$hmac" >> $GITHUB_ENV
 
       - name: Sending to Pulse HMAC
