@@ -272,7 +272,8 @@ jobs:
         run: |
           json_payload=$(jq -n  --arg userId "123" --arg message "This is a test" --argjson coverage $(jq -c . coverage/coverage-summary.json) '{ userId: $userId, message: $message, coverage: $coverage}')
           # echo "::set-output name=tc_teport::$json_payload"
-          echo "tc_teport=$(echo "$json_payload" | base64)" >> $GITHUB_ENV
+          payload=$(echo "$json_payload" | base64)
+          echo "tc_teport=$payload" >> $GITHUB_ENV
       
       - name: Generating HMAC
         id: generate_hamc_pulse_report
