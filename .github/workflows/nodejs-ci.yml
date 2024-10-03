@@ -257,11 +257,29 @@ jobs:
       #   with:
       #     message-id: test-coverage-report
       #     message-path: test-coverage-report.md
-      - name: Send Test Coverage Report to Pulse
-        id: pulse_report
+
+      - name: Checking Directories
+        id: check_pulse_report
         if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
         working-directory: ${{ github.workspace }}
-        run: ${{ inputs.my_command }}
+        run: |
+          ${{ inputs.my_command }}
+
+      - name: Composing Test Coverage Report
+        id: compose_pulse_report
+        if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
+        working-directory: ${{ github.workspace }}
+        run: |
+          json_payload=$(jq -n  --arg userId "123" --arg message "This is a test" --argjson coverage $(jq -c . coverage-summary.json) '{ userId: $userId, message: $message, coverage: $coverage}')
+      
+      - name: Generating HMAC
+        id: generate_hamc_pulse_report
+        if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo -n "$json_payload" | tr -d '\n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $1}'
+          # hmac=$(echo -n "$json_payload" | tr -d '\n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $2}')
+
       - name: Technology based scans after step
         if: ${{ inputs.technology_based_scans_after_step_command != '' }}
         run: |
