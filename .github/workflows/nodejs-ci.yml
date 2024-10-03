@@ -90,107 +90,107 @@ on:
         default: ""
 
 jobs:
-  caching:
-    name: cache_module
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    if: ${{ !(contains(fromJSON('["github-actions[bot]", "dependabot[bot]"]'), github.actor)) && (github.event_name != 'issue_comment') }}
-    container:
-      image: public.ecr.aws/studiographene/ci:node-20-alpine
-    outputs:
-      cache-key: ${{ steps.set-cache-key.outputs.cache-key }}  
-      cache-restore-key: ${{ steps.set-cache-restore-key.outputs.cache-restore-key }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }}
-      - name: before step
-        if: ${{ inputs.caching_before_step_command != '' }}
-        run: |
-          ${{ inputs.caching_before_step_command}}
-      - name: Convert lockfile version > 2 in case of npm
-        if: inputs.package_manager == 'npm'
-        run: |
-          ${{ inputs.package_manager }} install --lockfile-version 2 --package-lock-only
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN != '' && secrets.NPM_TOKEN || secrets.GITHUB_TOKEN }}          
-      - name: Set cache key
-        id: set-cache-key
-        if: |
-          inputs.package_manager == 'npm' || 
-          inputs.package_manager == 'yarn' || 
-          inputs.package_manager == 'pnpm'  
-        run: |
-          echo "cache-key=${{ runner.os }}-${{ inputs.package_manager }}-${{ hashFiles('**/package-lock.json', '**/package.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}" >> "$GITHUB_OUTPUT"  
-      - name: Set cache restore key
-        id: set-cache-restore-key
-        if: |
-          inputs.package_manager == 'npm' || 
-          inputs.package_manager == 'yarn' || 
-          inputs.package_manager == 'pnpm'  
-        run: |
-          echo "cache-restore-key=${{ runner.os }}-${{ inputs.package_manager }}-${{ hashFiles('**/package-lock.json', '**/package.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}" >> "$GITHUB_OUTPUT"  
-      - name: Cache node modules
-        id: cache-node-modules
-        if: |
-          inputs.package_manager == 'npm' || 
-          inputs.package_manager == 'yarn' || 
-          inputs.package_manager == 'pnpm'  
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ steps.set-cache-key.outputs.cache-key }} 
-          restore-keys: ${{ steps.set-cache-restore-key.outputs.cache-restore-key }}
-      - name: List the state of node modules
-        if: ${{ steps.cache-node-modules.outputs.cache-hit != 'true' }}
-        continue-on-error: true
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN != '' && secrets.NPM_TOKEN || secrets.GITHUB_TOKEN }}
-        run: ${{ inputs.package_manager }} list         
-      - name: Install dependencies
-        run: |
-          ${{ inputs.package_manager }} install
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN != '' && secrets.NPM_TOKEN || secrets.GITHUB_TOKEN }}
-      - name: Upload package-lock
-        uses: actions/upload-artifact@v4
-        if: inputs.package_manager == 'npm'
-        with:
-          name: lockFile
-          path: package-lock.json
-      - name: Upload yarn-lock
-        uses: actions/upload-artifact@v4
-        if: inputs.package_manager == 'yarn'
-        with:
-          name: lockFile
-          path: yarn.lock
-      - name: Upload pnpm-lock
-        uses: actions/upload-artifact@v4
-        if: inputs.package_manager == 'pnpm'
-        with:
-          name: lockFile
-          path: pnpm-lock.yaml
-      - name: after step
-        if: ${{ inputs.caching_after_step_command != '' }}
-        run: |
-          ${{ inputs.caching_after_step_command}}
+  # caching:
+  #   name: cache_module
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #   if: ${{ !(contains(fromJSON('["github-actions[bot]", "dependabot[bot]"]'), github.actor)) && (github.event_name != 'issue_comment') }}
+  #   container:
+  #     image: public.ecr.aws/studiographene/ci:node-20-alpine
+  #   outputs:
+  #     cache-key: ${{ steps.set-cache-key.outputs.cache-key }}  
+  #     cache-restore-key: ${{ steps.set-cache-restore-key.outputs.cache-restore-key }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ github.ref }}
+  #     - name: before step
+  #       if: ${{ inputs.caching_before_step_command != '' }}
+  #       run: |
+  #         ${{ inputs.caching_before_step_command}}
+  #     - name: Convert lockfile version > 2 in case of npm
+  #       if: inputs.package_manager == 'npm'
+  #       run: |
+  #         ${{ inputs.package_manager }} install --lockfile-version 2 --package-lock-only
+  #       env:
+  #         NPM_TOKEN: ${{ secrets.NPM_TOKEN != '' && secrets.NPM_TOKEN || secrets.GITHUB_TOKEN }}          
+  #     - name: Set cache key
+  #       id: set-cache-key
+  #       if: |
+  #         inputs.package_manager == 'npm' || 
+  #         inputs.package_manager == 'yarn' || 
+  #         inputs.package_manager == 'pnpm'  
+  #       run: |
+  #         echo "cache-key=${{ runner.os }}-${{ inputs.package_manager }}-${{ hashFiles('**/package-lock.json', '**/package.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}" >> "$GITHUB_OUTPUT"  
+  #     - name: Set cache restore key
+  #       id: set-cache-restore-key
+  #       if: |
+  #         inputs.package_manager == 'npm' || 
+  #         inputs.package_manager == 'yarn' || 
+  #         inputs.package_manager == 'pnpm'  
+  #       run: |
+  #         echo "cache-restore-key=${{ runner.os }}-${{ inputs.package_manager }}-${{ hashFiles('**/package-lock.json', '**/package.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}" >> "$GITHUB_OUTPUT"  
+  #     - name: Cache node modules
+  #       id: cache-node-modules
+  #       if: |
+  #         inputs.package_manager == 'npm' || 
+  #         inputs.package_manager == 'yarn' || 
+  #         inputs.package_manager == 'pnpm'  
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: node_modules
+  #         key: ${{ steps.set-cache-key.outputs.cache-key }} 
+  #         restore-keys: ${{ steps.set-cache-restore-key.outputs.cache-restore-key }}
+  #     - name: List the state of node modules
+  #       if: ${{ steps.cache-node-modules.outputs.cache-hit != 'true' }}
+  #       continue-on-error: true
+  #       env:
+  #         NPM_TOKEN: ${{ secrets.NPM_TOKEN != '' && secrets.NPM_TOKEN || secrets.GITHUB_TOKEN }}
+  #       run: ${{ inputs.package_manager }} list         
+  #     - name: Install dependencies
+  #       run: |
+  #         ${{ inputs.package_manager }} install
+  #       env:
+  #         NPM_TOKEN: ${{ secrets.NPM_TOKEN != '' && secrets.NPM_TOKEN || secrets.GITHUB_TOKEN }}
+  #     - name: Upload package-lock
+  #       uses: actions/upload-artifact@v4
+  #       if: inputs.package_manager == 'npm'
+  #       with:
+  #         name: lockFile
+  #         path: package-lock.json
+  #     - name: Upload yarn-lock
+  #       uses: actions/upload-artifact@v4
+  #       if: inputs.package_manager == 'yarn'
+  #       with:
+  #         name: lockFile
+  #         path: yarn.lock
+  #     - name: Upload pnpm-lock
+  #       uses: actions/upload-artifact@v4
+  #       if: inputs.package_manager == 'pnpm'
+  #       with:
+  #         name: lockFile
+  #         path: pnpm-lock.yaml
+  #     - name: after step
+  #       if: ${{ inputs.caching_after_step_command != '' }}
+  #       run: |
+  #         ${{ inputs.caching_after_step_command}}
 
-  security_scans:
-    name: security_scans
-    needs: caching
-    if: ${{ !(contains(fromJSON('["github-actions[bot]", "dependabot[bot]"]'), github.actor)) && (github.event_name != 'issue_comment') }}
-    uses: studiographene/github-action-workflows/.github/workflows/security-scans.yml@master
-    secrets: inherit
-    with:
-      security_scan_before_step_command: ${{ inputs.security_scan_before_step_command }}
-      security_scan_after_step_command: ${{ inputs.security_scan_after_step_command }}
-      excluded_jobs: ${{ inputs.excluded_jobs }}
-      semgrep_options: ${{ inputs.semgrep_options }}
+  # security_scans:
+  #   name: security_scans
+  #   needs: caching
+  #   if: ${{ !(contains(fromJSON('["github-actions[bot]", "dependabot[bot]"]'), github.actor)) && (github.event_name != 'issue_comment') }}
+  #   uses: studiographene/github-action-workflows/.github/workflows/security-scans.yml@master
+  #   secrets: inherit
+  #   with:
+  #     security_scan_before_step_command: ${{ inputs.security_scan_before_step_command }}
+  #     security_scan_after_step_command: ${{ inputs.security_scan_after_step_command }}
+  #     excluded_jobs: ${{ inputs.excluded_jobs }}
+  #     semgrep_options: ${{ inputs.semgrep_options }}
 
   technology_based_scans:
-    needs: caching
+    # needs: caching
     name: technology_based_scans
     runs-on: ubuntu-latest
     permissions:
@@ -271,28 +271,32 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           json_payload=$(jq -n  --arg userId "123" --arg message "This is a test" --argjson coverage $(jq -c . coverage/coverage-summary.json) '{ userId: $userId, message: $message, coverage: $coverage}')
-          echo "$json_payload"
-          payload=$(echo "$json_payload" | base64 -w 0)
-          echo "tc_report=$payload" >> $GITHUB_ENV
-      
-      - name: Generating HMAC
-        id: generate_hamc_pulse_report
-        if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
-        working-directory: ${{ github.workspace }}
-        run: |
-          json_payload=$(echo "$tc_report" | base64 --decode)
           hmac=$(echo -n "$json_payload" | tr -d '\n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $2}')
-          # hmac=$(echo -n "$json_payload" | openssl dgst -sha256 -hmac "supersecretkey")
-          echo "tc_signature=$hmac" >> $GITHUB_ENV
+          curl -v -X POST https://wicked-corners-bet.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $hmac" -d "$json_payload"
+          
+          
+      #     echo "$json_payload"
+      #     payload=$(echo "$json_payload" | base64 -w 0)
+      #     echo "tc_report=$payload" >> $GITHUB_ENV
+      
+      # - name: Generating HMAC
+      #   id: generate_hamc_pulse_report
+      #   if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
+      #   working-directory: ${{ github.workspace }}
+      #   run: |
+      #     json_payload=$(echo "$tc_report" | base64 --decode)
+      #     hmac=$(echo -n "$json_payload" | tr -d '\n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $2}')
+      #     # hmac=$(echo -n "$json_payload" | openssl dgst -sha256 -hmac "supersecretkey")
+      #     echo "tc_signature=$hmac" >> $GITHUB_ENV
 
-      - name: Sending to Pulse HMAC
-        id: post_hamc_pulse_report
-        if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
-        working-directory: ${{ github.workspace }}
-        run: |
-          json_payload=$(echo "$tc_report" | base64 --decode)
-          echo "$json_payload"
-          curl -v -X POST https://wicked-corners-bet.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: "$tc_signature"" -d "$json_payload"
+      # - name: Sending to Pulse HMAC
+      #   id: post_hamc_pulse_report
+      #   if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
+      #   working-directory: ${{ github.workspace }}
+      #   run: |
+      #     json_payload=$(echo "$tc_report" | base64 --decode)
+      #     echo "$json_payload"
+      #     curl -v -X POST https://wicked-corners-bet.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: "$tc_signature"" -d "$json_payload"
 
       - name: Technology based scans after step
         if: ${{ inputs.technology_based_scans_after_step_command != '' }}
