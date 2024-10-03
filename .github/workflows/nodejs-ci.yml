@@ -291,7 +291,7 @@ jobs:
         run: |
           json_payload=$(echo "$tc_report" | base64 --decode)
           echo "$json_payload"
-          curl -v -X POST https://yellow-ads-begin.loca.lt/data -H "Content-Type: application/json" -H "Kukuduku: $tc_report" -H "X-Signature: $tc_signature" -d "$(echo "$json_payload")"
+          curl -v -X POST https://yellow-ads-begin.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $tc_report" -d "$(echo "$json_payload")"
 
       - name: Technology based scans after step
         if: ${{ inputs.technology_based_scans_after_step_command != '' }}
