@@ -6,6 +6,9 @@ on:
       NPM_TOKEN:
         description: "A GitHub PersonalAccessToken used to access GitHub package regististy. NPM_TOKEN is also passed as Docker build --build-arg. If not defined default GITHUB_TOKEN is used."
         required: false
+      PULSE_HMAC_SECRET:
+        description: A secret used to hmac
+        required: true
     inputs:
       my_command:
         type: string
@@ -269,18 +272,23 @@ jobs:
         id: compose_pulse_report
         if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
         working-directory: ${{ github.workspace }}
+        env:
+          secret: ${{secrets.PULSE_HMAC_SECRET}}
+          url: ${{vars.PULSE_TEST_COVERAGE_URL}}
         run: |
-          current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          json_payload=$(jq -n \
-          --arg organisationId ${{ github.repository_owner_id }} \
-          --arg repoId ${{ github.repository_id }} \
-          --arg createdAt $current_date \
-          --argjson coverage $(jq -c . coverage/coverage-summary.json) \
-          '{ organisationId: $organisationId, repoId: $repoId, createdAt: $createdAt,  coverage: $coverage}')
-          hmac=$(echo -n "$json_payload" | tr -d ' \n' | openssl dgst -sha256 -hmac ${{ secrets.PULSE_SECRET }} | awk '{print $2}')
-          echo $json_payload
-          echo $hmac
-          curl -X POST https://whole-ducks-clean.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $hmac" -d "$json_payload"
+          echo "Secret: $secret" 
+          echo "URL:$url " 
+          # current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          # json_payload=$(jq -n \
+          # --arg organisationId ${{ github.repository_owner_id }} \
+          # --arg repoId ${{ github.repository_id }} \
+          # --arg createdAt $current_date \
+          # --argjson coverage $(jq -c . coverage/coverage-summary.json) \
+          # '{ organisationId: $organisationId, repoId: $repoId, createdAt: $createdAt,  coverage: $coverage}')
+          # hmac=$(echo -n "$json_payload" | tr -d ' \n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $2}')
+          # echo $json_payload
+          # echo $hmac
+          # curl -X POST https://whole-ducks-clean.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $hmac" -d "$json_payload"
           
           
       #     echo "$json_payload"
