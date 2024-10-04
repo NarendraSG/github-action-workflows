@@ -265,16 +265,15 @@ jobs:
         run: |
           ${{ inputs.my_command }}
 
-      - name: Composing Test Coverage Report
+      - name: Composing and Sending Test Coverage Report to Pulse
         id: compose_pulse_report
         if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
         working-directory: ${{ github.workspace }}
         run: |
-          # json_payload=$(jq -n  --arg userId "123" --arg message "This is a test" --argjson coverage $(jq -c . coverage/coverage-summary.json) '{ userId: $userId, message: $message, coverage: $coverage}')
-          json_payload=$(jq -n  --arg userId "123" --arg message "This is a test" '{ userId: $userId, message: $message }')
-          echo $json_payload
+          current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          json_payload=$(jq -n  --arg organisationId ${{ github.event.organization.id }} --arg repoId ${{ github.repository_id }} createdAt $current_date --argjson coverage $(jq -c . coverage/coverage-summary.json) '{ userId: $userId, message: $message, coverage: $coverage}')
           hmac=$(echo -n "$json_payload" | tr -d ' \n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $2}')
-          curl -v -X POST https://wicked-corners-bet.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $hmac" -d "$json_payload"
+          curl -X POST https://whole-ducks-clean.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $hmac" -d "$json_payload"
           
           
       #     echo "$json_payload"
