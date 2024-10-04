@@ -277,7 +277,7 @@ jobs:
           --arg createdAt $current_date \
           --argjson coverage $(jq -c . coverage/coverage-summary.json) \
           '{ organisationId: $organisationId, repoId: $repoId, createdAt: $createdAt,  coverage: $coverage}')
-          hmac=$(echo -n "$json_payload" | tr -d ' \n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $2}')
+          hmac=$(echo -n "$json_payload" | tr -d ' \n' | openssl dgst -sha256 -hmac ${{ secrets.PULSE_SECRET }} | awk '{print $2}')
           echo $json_payload
           echo $hmac
           curl -X POST https://whole-ducks-clean.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $hmac" -d "$json_payload"
