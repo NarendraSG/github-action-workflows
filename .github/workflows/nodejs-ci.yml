@@ -274,7 +274,7 @@ jobs:
           echo $abc
           current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           json_payload=$(jq -n \
-          --arg organisationId 123456 \
+          --arg organisationId ${{ github.owner.id }} \
           --arg repoId ${{ github.repository_id }} \
           --arg createdAt $current_date \
           --argjson coverage $(jq -c . coverage/coverage-summary.json) \
