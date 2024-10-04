@@ -8,7 +8,7 @@ on:
         required: false
       PULSE_HMAC_SECRET:
         description: A secret used to hmac
-        required: true
+        required: false
     inputs:
       my_command:
         type: string
