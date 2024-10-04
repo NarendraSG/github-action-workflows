@@ -271,8 +271,15 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          json_payload=$(jq -n  --arg organisationId ${{ github.event.organization.id }} --arg repoId ${{ github.repository_id }} createdAt $current_date --argjson coverage $(jq -c . coverage/coverage-summary.json) '{ userId: $userId, message: $message, coverage: $coverage}')
+          json_payload=$(jq -n \
+          --arg organisation_id ${{ github.event.organization.id }} \
+          --arg repo_id ${{ github.repository_id }} \
+          --arg created_at $current_date \
+          --argjson coverage $(jq -c . coverage/coverage-summary.json) \
+          '{ organisationId: organisation_id, repoId: repo_id, createdAt: created_at,  coverage: $coverage}')
           hmac=$(echo -n "$json_payload" | tr -d ' \n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $2}')
+          echo $json_payload
+          echo $hmac
           curl -X POST https://whole-ducks-clean.loca.lt/data -H "Content-Type: application/json" -H "X-Signature: $hmac" -d "$json_payload"
           
           
