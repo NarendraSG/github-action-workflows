@@ -270,13 +270,14 @@ jobs:
         if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
         working-directory: ${{ github.workspace }}
         run: |
+          echo $github
           current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           json_payload=$(jq -n \
           --arg organisation_id ${{ github.event.organization.id }} \
           --arg repo_id ${{ github.repository_id }} \
           --arg created_at $current_date \
           --argjson coverage $(jq -c . coverage/coverage-summary.json) \
-          '{ organisationId: organisation_id, repoId: repo_id, createdAt: created_at,  coverage: $coverage}')
+          '{ organisationId: $organisation_id, repoId: $repo_id, createdAt: $created_at,  coverage: $coverage}')
           hmac=$(echo -n "$json_payload" | tr -d ' \n' | openssl dgst -sha256 -hmac "supersecretkey" | awk '{print $2}')
           echo $json_payload
           echo $hmac
