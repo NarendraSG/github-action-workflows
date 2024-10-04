@@ -270,8 +270,6 @@ jobs:
         if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
         working-directory: ${{ github.workspace }}
         run: |
-          abc=${{toJson(github.event)}}
-          echo $abc
           current_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           json_payload=$(jq -n \
           --arg organisationId ${{ github.repository_owner_id }} \
