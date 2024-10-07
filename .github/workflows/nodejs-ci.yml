@@ -273,8 +273,8 @@ jobs:
         if: ${{ always() && inputs.run_dev_test && contains(inputs.dev_test_branch, github.event.pull_request.base.ref) }}
         working-directory: ${{ github.workspace }}
         env:
-          secret: ${{secrets.PULSE_HMAC_SECRET}}
-          url: ${{vars.PULSE_TEST_COVERAGE_URL}}
+          secret: ${{ secrets.PULSE_HMAC_SECRET }}
+          url: ${{ vars.PULSE_TEST_COVERAGE_URL }}
         run: |
           echo "Secret: $secret" 
           echo "URL:$url " 
